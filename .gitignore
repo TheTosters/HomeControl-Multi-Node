@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+.pioenvs
+.clang_complete
+.gcc-flags.json
