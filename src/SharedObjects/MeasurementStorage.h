@@ -29,34 +29,42 @@
  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- ModuleDS18B20.h
- Created on: May 21, 2017
+ MeasurementStorage.h
+ Created on: May 22, 2017
  Author: Bartłomiej Żarnowski (Toster)
  */
-#ifndef ModuleDS18B20_hpp
-#define ModuleDS18B20_hpp
+#ifndef MeasurementStorage_hpp
+#define MeasurementStorage_hpp
 
-#ifdef HW_DS18B20
-
-#include <Modules/Module.hpp>
 #include <Arduino.h>
-#include <DS18B20.h>
 
-
-class ModuleDS18B20: public Module {
+class StorageNode {
   public:
-    ModuleDS18B20();
-    virtual ~ModuleDS18B20() = default;
-    virtual void onLoop() override;
-    virtual bool handleCommand() override;
+    StorageNode* next;
+    const uint8_t storageId;
+    const uint8_t size;
+    const bool isFloat;
+    uint8_t count;  //how many are actually inserted
+    void* values;
+    unsigned long* timestamps;
 
-  private:
-    unsigned long lastMeasurementTimeStamp;
-    unsigned long measurementPeriod;
-    uint8_t  address[8];
-    DS18B20* sensor;
+    StorageNode(uint8_t id, uint8_t size, bool isFloat);
 };
 
-#endif //HW_DS18B20
+class MeasurementStorage {
+  public:
+    MeasurementStorage();
+    void prepareStorage(uint8_t storageId, bool isFloat, int8_t size);
+    void addMeasurement(uint8_t storageId, float value);
+    void addMeasurement(uint8_t storageId, int32_t value);
+    void getMeasurement(uint8_t storageId, int8_t index, float& floatValue, unsigned long& timestamp);
+    void getMeasurement(uint8_t storageId, int8_t index, int32_t& intValue, unsigned long& timestamp);
+    uint8_t getMeasurementCount(uint8_t storageId);
+  private:
+    StorageNode* listHead;
 
-#endif /* ModuleDS18B20_hpp */
+    StorageNode* getNode(uint8_t storageId);
+};
+
+extern MeasurementStorage sharedStorage;
+#endif /* MeasurementStorage_hpp */

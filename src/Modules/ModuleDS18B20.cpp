@@ -38,17 +38,45 @@
 
 #include <Modules/ModuleDS18B20.h>
 #include <SharedObjects/OneWireShared.h>
-#include <DS18B20.h>
+#include <SharedObjects/MeasurementStorage.h>
 
-static DS18B20 ds18B20Sensor(&oneWire);
+#define DEFAULT_READ_PERIOD (5UL * 60 * 1000)
+#define DS18B20_STORAGE_ID  0x0d
+
+#ifndef DS18B20_STORAGE_SIZE
+#define DS18B20_STORAGE_SIZE 10
+#endif
 
 ModuleDS18B20::ModuleDS18B20()
-: Module(10) {
+: Module(10),
+  lastMeasurementTimeStamp( millis() ),
+  measurementPeriod( DEFAULT_READ_PERIOD ),
+  address{0},
+  sensor(new DS18B20(&oneWire) ){
 
+  sharedStorage.prepareStorage(DS18B20_STORAGE_ID, true, DS18B20_STORAGE_SIZE);
 }
 
 void ModuleDS18B20::onLoop() {
+  if (millis() - lastMeasurementTimeStamp < measurementPeriod) {
+    return;
+  }
+  //do reading
+  bool requestRet = sensor->request(address);
+  if (requestRet) {
+    while (!sensor->available()) {
+      //timeout is included in the sensor
+    }
 
+    float result = sensor->readTemperature(address);
+
+    if (result != TEMP_ERROR) {
+      sharedStorage.addMeasurement(DS18B20_STORAGE_ID, result);
+    }
+
+  } else {
+    //todo: ignore?
+  }
 }
 
 bool ModuleDS18B20::handleCommand() {
