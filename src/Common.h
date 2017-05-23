@@ -38,4 +38,7 @@ Created on: May 22, 2017
 
 #define ARRAY_SIZE(tab)  (sizeof(tab)/sizeof(tab[0]))
 
+//should be defined somehow for debug, for release code it should be empty
+#define INTERNAL_FAIL() {}
+
 #endif /* Common_hpp */
