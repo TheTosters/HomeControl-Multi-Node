@@ -37,11 +37,16 @@
 #define IncommingCommands_hpp
 
 #include <MiniParser/MiniInParser.h>
+#include <MiniParser/RemoteCommandBuilder.h>
 
 #ifndef MAX_IN_STRING_BUFFER
+//not this value has also impact on RemoteCommandBuilder, and determines maximum size of out command.
 #define MAX_IN_STRING_BUFFER 20
 #endif
 
+//WARNING: parse buffer is shared so in one time only incommingCommand or remoteCommandBuilder can be used, or all will
+//blow up!
 extern Command incommingCommand;
+extern RemoteCommandBuilder remoteCommandBuilder;
 
 #endif /* IncommingCommands_hpp */

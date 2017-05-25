@@ -39,14 +39,16 @@
 #ifdef HW_HM10
 
 #include <Modules/Module.hpp>
+#include <MiniParser/RemoteCommandBuilder.h>
 
 //One of Communication bridges, only one com bridge can be found in project
 //it's responsible for reading data and execution parser on it
-class ModuleHM10: public Module {
+class ModuleHM10: public Module, public ComandSender {
   public:
     ModuleHM10();
     virtual ~ModuleHM10() = default;
     virtual void onLoop() override;
+    virtual void doSendCommand(const char* dataToSend) override;
   private:
     bool swallowUntilEnd;
     bool expectPreamble;

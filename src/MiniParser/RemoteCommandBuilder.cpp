@@ -72,16 +72,29 @@ int ftoa(float n, char *res, int afterpoint) {
   return i;
 }
 
-RemoteCommandBuilder::RemoteCommandBuilder(const char* cmd, char* outCmdBuffer, uint8_t cmdBufferSize)
+RemoteCommandBuilder::RemoteCommandBuilder(char* outCmdBuffer, uint8_t cmdBufferSize)
 : outCmd(outCmdBuffer),
   cmdBufferSize(cmdBufferSize),
-  index(3), //we will copy cmd into buffer
+  index(0), //we will copy cmd into buffer
   elementsType(ElementType::UNKNOWN),
   isSequenceOpen(false),
   needComa(false),
-  expectedNextSubsequence(false) {
+  expectedNextSubsequence(false),
+  sender(nullptr) {
 
+}
+
+void RemoteCommandBuilder::setSender(ComandSender* sender) {
+  this->sender = sender;
+}
+
+void RemoteCommandBuilder::setCommand(const char* cmd) {
   memcpy(outCmd, cmd, 3);
+  index = 3;
+  elementsType = ElementType::UNKNOWN;
+  isSequenceOpen = false;
+  needComa = false;
+  expectedNextSubsequence = false;
 }
 
 void RemoteCommandBuilder::addArgument(const int32_t value) {
@@ -162,14 +175,13 @@ void RemoteCommandBuilder::endSequence() {
   expectedNextSubsequence = true;
 }
 
-char* RemoteCommandBuilder::buildCommand() {
+void RemoteCommandBuilder::buildAndSendCommand() {
   if (isSequenceOpen == true) {
     INTERNAL_FAIL();
-    return nullptr;
   }
   //tmp += "\r";
   outCmd[index++] = '\r';
   outCmd[index] = 0;
 
-  return outCmd;
+  sender->doSendCommand(outCmd);
 }

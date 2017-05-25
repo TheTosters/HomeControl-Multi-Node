@@ -10,23 +10,27 @@
 
 #include <stdint.h>
 
-typedef bool(*ParserDataFeeder)(char*);
-
 enum class OutParamType : char {
     NONE,
     INT_DIGIT,     //signed!
-    //beware! Fixed in format 24.8 U2 encoded = 32bits! -> 0x00 00 00 00  XX XX XX XX
-    FIXED_DIGIT,
+    FLOAT_DIGIT,
     STRING,
 };
 
-typedef struct {
+struct NetCommand {
     uint32_t        cmd;
     OutParamType    outParamType;
-    uint64_t        numericValue;
+    union{
+        uint64_t    integerValue;
+        float       floatValue;
+    };
     char*           stringValue;
-    int8_t          stringValueMaxLen;
-} Command;
+    uint8_t         stringValueMaxLen;
+
+    NetCommand(char* strBuf, uint8_t bufSize);
+};
+
+typedef struct NetCommand Command;
 
 enum class ParseResult : char {
     WILL_CONTINUE,

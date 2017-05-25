@@ -37,10 +37,5 @@
 
 static const char stringBuffer[MAX_IN_STRING_BUFFER] = {0};
 
-Command incommingCommand = {
-    .cmd = 0,
-    .outParamType = OutParamType::NONE,
-    .numericValue = 0,
-    .stringValue = (char*)stringBuffer,
-    .stringValueMaxLen = MAX_IN_STRING_BUFFER
-};
+Command incommingCommand((char*)stringBuffer, MAX_IN_STRING_BUFFER);
+RemoteCommandBuilder remoteCommandBuilder((char*)stringBuffer, MAX_IN_STRING_BUFFER);

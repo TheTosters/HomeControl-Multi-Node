@@ -35,6 +35,7 @@
  */
 #include <SharedObjects/MeasurementStorage.h>
 #include <Common.h>
+#include <SharedObjects/IncommingCommands.h>
 
 MeasurementStorage sharedStorage;
 
@@ -64,16 +65,17 @@ void MeasurementStorage::addMeasurement(uint8_t storageId, float value) {
     if (node->isFloat == false) {
       addMeasurement(storageId, static_cast<int32_t>(value));
     } else {
-      uint8_t index;
-      if (node->count == node->size) {
-        memcpy(node->values, ((uint8_t*)node->values) + sizeof(float), (node->size - 1) * sizeof(float));
-        memcpy(node->timestamps, node->timestamps + 1, (node->size - 1) * sizeof(unsigned long));
-        index = node->count - 1;
-      } else {
-        index = node->count;
-        node->count ++;
+      uint8_t index = 0;
+      if (node->size > 1) {
+        if (node->count == node->size) {
+          memcpy(node->values, ((uint8_t*) node->values) + sizeof(float), (node->size - 1) * sizeof(float));
+          memcpy(node->timestamps, node->timestamps + 1, (node->size - 1) * sizeof(unsigned long));
+          index = node->count - 1;
+        } else {
+          index = node->count;
+          node->count++;
+        }
       }
-
       float* tmp = (float*)node->values;
       tmp[index] = value;
       node->timestamps[index] = millis();
@@ -87,16 +89,17 @@ void MeasurementStorage::addMeasurement(uint8_t storageId, int32_t value) {
     if (node->isFloat == true) {
       addMeasurement(storageId, static_cast<float>(value));
     } else {
-      uint8_t index;
-      if (node->count == node->size) {
-        memcpy(node->values, ((uint8_t*) node->values) + sizeof(int32_t), (node->size - 1) * sizeof(int32_t));
-        memcpy(node->timestamps, node->timestamps + 1, (node->size - 1) * sizeof(unsigned long));
-        index = node->count - 1;
-      } else {
-        index = node->count;
-        node->count++;
+      uint8_t index = 0;
+      if (node->size > 0) {
+        if (node->count == node->size) {
+          memcpy(node->values, ((uint8_t*) node->values) + sizeof(int32_t), (node->size - 1) * sizeof(int32_t));
+          memcpy(node->timestamps, node->timestamps + 1, (node->size - 1) * sizeof(unsigned long));
+          index = node->count - 1;
+        } else {
+          index = node->count;
+          node->count++;
+        }
       }
-
       int32_t* tmp = (int32_t*) node->values;
       tmp[index] = value;
       node->timestamps[index] = millis();
@@ -108,12 +111,12 @@ void MeasurementStorage::getMeasurement(uint8_t storageId, int8_t index, float& 
   StorageNode* node = getNode(storageId);
   if (node) {
     if (node->isFloat) {
-      floatValue = ((float*) node->values)[index];
+      innerGetMeasurement(node, index, floatValue, timestamp);
     } else {
-      int32_t* tmp = (int32_t*) node->values;
-      floatValue = static_cast<float>(tmp[index]);
+      int32_t tmp;
+      innerGetMeasurement(node, index, tmp, timestamp);
+      floatValue = static_cast<float>(tmp);
     }
-    timestamp = node->timestamps[index];
   } else {
     floatValue = 0;
     timestamp = 0;
@@ -124,15 +127,35 @@ void MeasurementStorage::getMeasurement(uint8_t storageId, int8_t index, int32_t
   StorageNode* node = getNode(storageId);
   if (node) {
     if (node->isFloat) {
-      float* tmp = (float*) node->values;
-      intValue = static_cast<int32_t>(tmp[index]);
+      float tmp;
+      innerGetMeasurement(node, index, tmp, timestamp);
+      intValue = static_cast<int32_t>(tmp);
     } else {
-      intValue = ((int32_t*) node->values)[index];
+      innerGetMeasurement(node, index, intValue, timestamp);
     }
-    timestamp = node->timestamps[index];
   } else {
     intValue = 0;
     timestamp = 0;
+  }
+}
+
+void MeasurementStorage::innerGetMeasurement(StorageNode* node, int8_t index, float& floatValue, unsigned long& timestamp) {
+  if (index > 0 && index < node->count) {
+      timestamp = node->timestamps[index];
+      floatValue = ((float*) node->values)[index];
+    } else {
+      timestamp = 0;
+      floatValue = 0;
+    }
+}
+
+void MeasurementStorage::innerGetMeasurement(StorageNode* node, int8_t index, int32_t& intValue, unsigned long& timestamp) {
+  if (index > 0 && index < node->count) {
+    timestamp = node->timestamps[index];
+    intValue = ((int32_t*) node->values)[index];
+  } else {
+    timestamp = 0;
+    intValue = 0;
   }
 }
 
@@ -150,4 +173,32 @@ StorageNode* MeasurementStorage::getNode(uint8_t storageId) {
   }
 
   return nullptr;
+}
+
+void MeasurementStorage::sendHistory(const char* wrappingCommand, uint8_t storageId, uint8_t count) {
+  StorageNode* node = getNode(storageId);
+  if (node == nullptr) {
+    return;
+  }
+  count = count > node->count ? node->count : count;
+  unsigned long now = millis();
+  remoteCommandBuilder.setCommand(wrappingCommand);
+  unsigned long timestamp;
+  for(int t = 0; t < count; t++) {
+    remoteCommandBuilder.startSequence();
+    if (node->isFloat) {
+      float value;
+      innerGetMeasurement(node, t, value, timestamp);
+      remoteCommandBuilder.addArgument( (int32_t)(now - timestamp) );
+      remoteCommandBuilder.addArgument(value);
+
+    } else {
+      int32_t value;
+      innerGetMeasurement(node, t, value, timestamp);
+      remoteCommandBuilder.addArgument( (int32_t)(now - node->timestamps[t]) );
+      remoteCommandBuilder.addArgument(value);
+    }
+    remoteCommandBuilder.endSequence();
+  }
+  remoteCommandBuilder.buildAndSendCommand();
 }

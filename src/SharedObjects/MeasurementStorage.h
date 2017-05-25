@@ -60,10 +60,13 @@ class MeasurementStorage {
     void getMeasurement(uint8_t storageId, int8_t index, float& floatValue, unsigned long& timestamp);
     void getMeasurement(uint8_t storageId, int8_t index, int32_t& intValue, unsigned long& timestamp);
     uint8_t getMeasurementCount(uint8_t storageId);
+    void sendHistory(const char* wrappingCommand, uint8_t storageId, uint8_t count);
   private:
     StorageNode* listHead;
 
     StorageNode* getNode(uint8_t storageId);
+    void innerGetMeasurement(StorageNode* node, int8_t index, float& floatValue, unsigned long& timestamp);
+    void innerGetMeasurement(StorageNode* node, int8_t index, int32_t& intValue, unsigned long& timestamp);
 };
 
 extern MeasurementStorage sharedStorage;

@@ -54,7 +54,13 @@ class ModuleDS18B20: public Module {
     unsigned long lastMeasurementTimeStamp;
     unsigned long measurementPeriod;
     uint8_t  address[8];
+    uint8_t  resolution; //allowed 9-12
     DS18B20* sensor;
+
+    void doMeasurement();
+    void handleConfigPeriod();
+    void handleConfigResolution();
+    void handleMeasurement();
 };
 
 #endif //HW_DS18B20

@@ -10,43 +10,52 @@
 
 static const char endLineCharacter = 13;
 
-typedef enum {
-    MiniInParserMode_EXPECT_COMMAND,
-    MiniInParserMode_CMD_PARSED,
-    MiniInParserMode_DIGIT,
-    MiniInParserMode_DIGIT_FIXED,
-    MiniInParserMode_DIGIT_SWALLOW,
-    MiniInParserMode_STRING,
-    MiniInParserMode_NEED_RESET,
-} MiniInParserMode;
+enum class MiniInParserMode : char {
+    EXPECT_COMMAND,
+    CMD_PARSED,
+    DIGIT,
+    DIGIT_FIXED,
+    DIGIT_SWALLOW,
+    STRING,
+    NEED_RESET,
+} ;
 
-typedef enum {
-    ParserHelperState_START_OF_MODE,
-    ParserHelperState_IN_PROGRESS,
-    ParserHelperState_EXPECT_EOL,
-    ParserHelperState_SWALLOW_TO_EOL
-} ParserHelperState;
+enum class ParserHelperState : char {
+    START_OF_MODE,
+    IN_PROGRESS,
+    EXPECT_EOL,
+    SWALLOW_TO_EOL
+};
 
-static MiniInParserMode mode = MiniInParserMode_EXPECT_COMMAND;
-static ParserHelperState parserHelper = ParserHelperState_START_OF_MODE;
+static MiniInParserMode mode = MiniInParserMode::EXPECT_COMMAND;
+static ParserHelperState parserHelper = ParserHelperState::START_OF_MODE;
 static int8_t parserIndex;
 static bool negative;
 static uint16_t fracPart;
 
+NetCommand::NetCommand(char* strBuf, uint8_t bufSize)
+: cmd(0),
+  outParamType(OutParamType::NONE),
+  floatValue(0),
+  stringValue(strBuf),
+  stringValueMaxLen(bufSize)
+{
+}
+
 void parseCmd(char nextChar, Command* outCmd, ParseResult* result) {
-    if (parserHelper == ParserHelperState_START_OF_MODE) {
+    if (parserHelper == ParserHelperState::START_OF_MODE) {
         outCmd->cmd = 0;
-        parserHelper = ParserHelperState_IN_PROGRESS;
+        parserHelper = ParserHelperState::IN_PROGRESS;
     }
     if (nextChar == endLineCharacter) {
         *result = ParseResult::ERROR_NO_CMD;
-        mode = MiniInParserMode_NEED_RESET;
+        mode = MiniInParserMode::NEED_RESET;
         return;
     }
 
     if (nextChar < 'A' || nextChar > 'Z') {
         *result = ParseResult::ERROR_INVALID_CMD;
-        mode = MiniInParserMode_NEED_RESET;
+        mode = MiniInParserMode::NEED_RESET;
         return;
     }
 
@@ -54,7 +63,7 @@ void parseCmd(char nextChar, Command* outCmd, ParseResult* result) {
     outCmd->cmd <<= 8;
     parserIndex++;
 
-    mode = parserIndex == 3 ? MiniInParserMode_CMD_PARSED : MiniInParserMode_EXPECT_COMMAND;
+    mode = parserIndex == 3 ? MiniInParserMode::CMD_PARSED : MiniInParserMode::EXPECT_COMMAND;
     *result = ParseResult::WILL_CONTINUE;
 }
 
@@ -66,9 +75,9 @@ void finalizeParseWithSuccess(ParseResult* result) {
 void handleStringArgument(char nextChar, Command* outCmd, ParseResult* result) {
 
     if (nextChar == endLineCharacter) {
-        if (parserHelper != ParserHelperState_EXPECT_EOL) {
+        if (parserHelper != ParserHelperState::EXPECT_EOL) {
             *result = ParseResult::ERROR_MALFORMED;
-            mode = MiniInParserMode_NEED_RESET;
+            mode = MiniInParserMode::NEED_RESET;
             return;
 
         } else {
@@ -81,95 +90,90 @@ void handleStringArgument(char nextChar, Command* outCmd, ParseResult* result) {
     if (parserIndex >= outCmd->stringValueMaxLen - 1) {
         if (nextChar == '"') {
             outCmd->stringValue[parserIndex] = 0;
-            parserHelper = ParserHelperState_EXPECT_EOL;
+            parserHelper = ParserHelperState::EXPECT_EOL;
             *result = ParseResult::WILL_CONTINUE;
-            mode = MiniInParserMode_STRING;
+            mode = MiniInParserMode::STRING;
 
         } else {
             outCmd->stringValue[outCmd->stringValueMaxLen - 1] = 0;
             *result = ParseResult::ERROR_STRING_OVERFLOW;
-            mode = MiniInParserMode_NEED_RESET;
+            mode = MiniInParserMode::NEED_RESET;
         }
         return;
     }
 
     if (nextChar == '"') {
-      if (parserHelper == ParserHelperState_EXPECT_EOL) {
+      if (parserHelper == ParserHelperState::EXPECT_EOL) {
           *result = ParseResult::ERROR_MALFORMED;
-          mode = MiniInParserMode_NEED_RESET;
+          mode = MiniInParserMode::NEED_RESET;
         
       } else {
           outCmd->stringValue[parserIndex] = 0;
-          parserHelper = ParserHelperState_EXPECT_EOL;
+          parserHelper = ParserHelperState::EXPECT_EOL;
           *result = ParseResult::WILL_CONTINUE;
-          mode = MiniInParserMode_STRING;
+          mode = MiniInParserMode::STRING;
       }
       return;
     }
   
     if (nextChar <' ' || nextChar > '~') {
         *result = ParseResult::ERROR_MALFORMED;
-        mode = MiniInParserMode_NEED_RESET;
+        mode = MiniInParserMode::NEED_RESET;
         return;
     }
 
     outCmd->stringValue[parserIndex] = nextChar;
     parserIndex++;
     *result = ParseResult::WILL_CONTINUE;
-    mode = MiniInParserMode_STRING;
+    mode = MiniInParserMode::STRING;
 }
 
 void handleDigitArgument(char nextChar, Command* outCmd, ParseResult* result) {
-    if (parserHelper == ParserHelperState_START_OF_MODE) {
-        outCmd->numericValue = 0;
+    if (parserHelper == ParserHelperState::START_OF_MODE) {
+        outCmd->integerValue = 0;
         negative = nextChar == '-';
-        parserHelper = ParserHelperState_IN_PROGRESS;
+        parserHelper = ParserHelperState::IN_PROGRESS;
         if (negative == true) {
             *result = ParseResult::WILL_CONTINUE;
-            mode = MiniInParserMode_DIGIT;
+            mode = MiniInParserMode::DIGIT;
             return;
         }
     }
     if (nextChar == endLineCharacter) {
         if (negative) {
-            outCmd->numericValue = -outCmd->numericValue;
+            outCmd->integerValue = -outCmd->integerValue;
         }
         finalizeParseWithSuccess(result);
         return;
     }
     if (nextChar == '.') {
         *result = ParseResult::WILL_CONTINUE;
-        mode = MiniInParserMode_DIGIT_FIXED;
+        mode = MiniInParserMode::DIGIT_FIXED;
         parserIndex = 0;
         fracPart = 0;
-        outCmd->outParamType = OutParamType::FIXED_DIGIT;
+        outCmd->outParamType = OutParamType::FLOAT_DIGIT;
         return;
     }
     if (nextChar < '0' || nextChar > '9') {
         *result = ParseResult::ERROR_MALFORMED;
-        mode = MiniInParserMode_NEED_RESET;
+        mode = MiniInParserMode::NEED_RESET;
         return;
     }
-    outCmd->numericValue *= 10;
-    outCmd->numericValue += nextChar - '0';
+    outCmd->integerValue *= 10;
+    outCmd->integerValue += nextChar - '0';
     *result = ParseResult::WILL_CONTINUE;
-    mode = MiniInParserMode_DIGIT;
+    mode = MiniInParserMode::DIGIT;
 }
 
 void finalizeFixedDigit(Command* outCmd, ParseResult* result) {
-    //in outCmd->numericValue is integral part, it need to be truncated to 23b (1 bit for sign)
-    if (outCmd->numericValue > 0x7FFFFF) {
-        outCmd->numericValue = 0x7FFFFF;
-    }
-    outCmd->numericValue <<= 8; //make place for fract part
-    uint16_t base = 1;
+    int base = 1;
     for(;parserIndex != 0; parserIndex --) {
         base *= 10;
     }
-    uint16_t scalled = (fracPart << 8) / base;
-    outCmd->numericValue |= scalled & 0xFF;
+
+    outCmd->floatValue = outCmd->integerValue + (float)fracPart / base;
     if (negative) {
-        outCmd->numericValue = (~outCmd->numericValue) & 0xFFFFFFFF;
+        outCmd->floatValue = -outCmd->floatValue;
     }
     finalizeParseWithSuccess(result);
 }
@@ -182,32 +186,32 @@ void handleFracDigitArgument(char nextChar, Command* outCmd, ParseResult* result
 
     if (nextChar < '0' || nextChar > '9') {
         *result = ParseResult::ERROR_MALFORMED;
-        mode = MiniInParserMode_NEED_RESET;
+        mode = MiniInParserMode::NEED_RESET;
         return;
     }
-    if (parserHelper == ParserHelperState_IN_PROGRESS) {
+    if (parserHelper == ParserHelperState::IN_PROGRESS) {
         fracPart *= 10;
         fracPart += nextChar - '0';
         parserIndex++;
-        parserHelper = parserIndex < 3 ? ParserHelperState_IN_PROGRESS : ParserHelperState_SWALLOW_TO_EOL;
+        parserHelper = parserIndex < 3 ? ParserHelperState::IN_PROGRESS : ParserHelperState::SWALLOW_TO_EOL;
     }
     *result = ParseResult::WILL_CONTINUE;
-    mode = MiniInParserMode_DIGIT_FIXED;
+    mode = MiniInParserMode::DIGIT_FIXED;
 }
 
 void discoverParam(char nextChar, Command* outCmd, ParseResult* result) {
     if (nextChar == '"') {
         *result = ParseResult::WILL_CONTINUE;
-        mode = MiniInParserMode_STRING;
+        mode = MiniInParserMode::STRING;
         outCmd->outParamType = OutParamType::STRING;
-        parserHelper = ParserHelperState_START_OF_MODE;
+        parserHelper = ParserHelperState::START_OF_MODE;
         parserIndex = 0;
 
     } else if (nextChar == '-' || (nextChar >= '0' && nextChar <= '9')) {
         *result = ParseResult::WILL_CONTINUE;
-        mode = MiniInParserMode_DIGIT;
+        mode = MiniInParserMode::DIGIT;
         outCmd->outParamType = OutParamType::INT_DIGIT;
-        parserHelper = ParserHelperState_START_OF_MODE;
+        parserHelper = ParserHelperState::START_OF_MODE;
         parserIndex = 0;
         handleDigitArgument(nextChar, outCmd, result);
 
@@ -217,7 +221,7 @@ void discoverParam(char nextChar, Command* outCmd, ParseResult* result) {
 
     } else {
         *result = ParseResult::ERROR_MALFORMED;
-        mode = MiniInParserMode_NEED_RESET;
+        mode = MiniInParserMode::NEED_RESET;
     }
 }
 
@@ -225,27 +229,27 @@ ParseResult miniInParse(char nextChar, Command* outCmd) {
     ParseResult result = ParseResult::ERROR_MALFORMED;
     switch(mode) {
         default:
-        case MiniInParserMode_EXPECT_COMMAND:
+        case MiniInParserMode::EXPECT_COMMAND:
             parseCmd(nextChar, outCmd, &result);
             break;
 
-        case MiniInParserMode_CMD_PARSED:
+        case MiniInParserMode::CMD_PARSED:
             discoverParam(nextChar, outCmd, &result);
             break;
 
-        case MiniInParserMode_STRING:
+        case MiniInParserMode::STRING:
             handleStringArgument(nextChar, outCmd, &result);
             break;
 
-        case MiniInParserMode_DIGIT:
+        case MiniInParserMode::DIGIT:
             handleDigitArgument(nextChar, outCmd, &result);
             break;
 
-        case MiniInParserMode_DIGIT_FIXED:
+        case MiniInParserMode::DIGIT_FIXED:
             handleFracDigitArgument(nextChar, outCmd, &result);
             break;
         
-        case MiniInParserMode_NEED_RESET:
+        case MiniInParserMode::NEED_RESET:
             result = ParseResult::ERROR_NEED_RESET_PARSER;
             break;
     }
@@ -254,9 +258,9 @@ ParseResult miniInParse(char nextChar, Command* outCmd) {
 }
 
 void miniInParserReset() {
-    mode = MiniInParserMode_EXPECT_COMMAND;
+    mode = MiniInParserMode::EXPECT_COMMAND;
     parserIndex = 0;
     negative = false;
     fracPart = 0;
-    parserHelper = ParserHelperState_START_OF_MODE;
+    parserHelper = ParserHelperState::START_OF_MODE;
 }

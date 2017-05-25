@@ -63,13 +63,19 @@ ModuleHM10::ModuleHM10() : Module(50), expectPreamble(true) {
 }
 
 void ModuleHM10::sendBTCommand(const char * command, bool waitResponse) {
-    char buffer[24];
-    Serial.begin(9600);
-    Serial.write((const uint8_t*)command, strlen(command));
-    if (waitResponse) {
-        Serial.setTimeout(800);
-        Serial.readBytes(buffer, ARRAY_SIZE(buffer));
-    }
+  //this send AT control command to HM10
+  char buffer[24];
+  Serial.begin(9600);
+  Serial.write((const uint8_t*) command, strlen(command));
+  if (waitResponse) {
+    Serial.setTimeout(800);
+    Serial.readBytes(buffer, ARRAY_SIZE(buffer));
+  }
+}
+
+void ModuleHM10::doSendCommand(const char* dataToSend) {
+  //this send Node protocol encoded command to connected client
+  Serial.write((const uint8_t*)dataToSend, strlen(dataToSend));
 }
 
 void ModuleHM10::onLoop() {

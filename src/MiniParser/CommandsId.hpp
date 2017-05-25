@@ -29,50 +29,27 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-ModulesControl.cpp
-Created on: May 21, 2017
+CommandsId.hpp
+Created on: May 22, 2017
     Author: Bartłomiej Żarnowski (Toster)
 */
+#ifndef CommandsId_hpp
+#define CommandsId_hpp
 
-#include <Arduino.h>
-#include <Modules/ModuleDS18B20.h>
-#include <Modules/ModuleHM10.h>
-#include <ModulesControl.h>
-#include <SharedObjects/IncommingCommands.h>
+//------- Temperature related commands ------
+//----
+#define CMD_READ_TEMPERATURE_MESUREMENT     0x52544800
+#define S_CMD_READ_TEMPERATURE_MESUREMENT   "RTH"
 
-Module* modulesHead = nullptr;
+#define CMD_CONFIG_TEMP_READING_PERIOD      0x43545000
+#define S_CMD_CONFIG_TEMP_READING_PERIOD    "CTP"
 
-static void addModule(Module* module) {
+#define CMD_CONFIG_TEMP_MEASURE_RESOLUTION   0x43545200
+#define S_CMD_CONFIG_TEMP_MEASURE_RESOLUTION "CTR"
 
-  if (modulesHead == nullptr || modulesHead->priority > module->priority) {
-    module->next = modulesHead;
-    modulesHead = module;
+#define CMD_DELIVER_TEMP_HISTORY    0x56544d00
+#define S_CMD_DELIVER_TEMP_HISTORY  "VTM"
 
-  } else {
-    Module* tmp = modulesHead;
-    Module* prev = nullptr;
-    while(tmp != nullptr && tmp->priority < module->priority) {
-      prev = tmp;
-      tmp = tmp->next;
-    }
-    module->next = prev->next;
-    prev->next = module;
-  }
-}
 
-void setupModules() {
 
-#ifdef HW_DS18B20
-  addModule(new ModuleDS18B20());
-#endif
-
-#ifdef HW_HM10
-  ModuleHM10* hm10 = new ModuleHM10();
-  addModule(hm10);
-  remoteCommandBuilder.setSender(hm10);
-#endif
-}
-
-void handleCommandByModules() {
-
-}
+#endif /* CommandsId_hpp */

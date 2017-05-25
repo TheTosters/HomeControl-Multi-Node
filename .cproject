@@ -68,8 +68,8 @@
 									<listOptionValue builtIn="false" value="ARDUINO_AVR_NANO"/>
 									<listOptionValue builtIn="false" value="ONE_WIRE_PIN=4"/>
 									<listOptionValue builtIn="false" value="ADC_PIN=6"/>
-									<listOptionValue builtIn="false" value="HW_DS18B20"/>
 									<listOptionValue builtIn="false" value="HW_HM10"/>
+									<listOptionValue builtIn="false" value="HW_DS18B20"/>
 									<listOptionValue builtIn="false" value="ARDUINO=10618"/>
 									<listOptionValue builtIn="false" value="__AVR_ATmega328P__"/>
 								</option>
@@ -122,8 +122,8 @@
 									<listOptionValue builtIn="false" value="ARDUINO_AVR_NANO"/>
 									<listOptionValue builtIn="false" value="ONE_WIRE_PIN=4"/>
 									<listOptionValue builtIn="false" value="ADC_PIN=6"/>
-									<listOptionValue builtIn="false" value="HW_DS18B20"/>
 									<listOptionValue builtIn="false" value="HW_HM10"/>
+									<listOptionValue builtIn="false" value="HW_DS18B20"/>
 									<listOptionValue builtIn="false" value="ARDUINO=10618"/>
 									<listOptionValue builtIn="false" value="__AVR_ATmega328P__"/>
 								</option>
@@ -176,8 +176,8 @@
 									<listOptionValue builtIn="false" value="ARDUINO_AVR_NANO"/>
 									<listOptionValue builtIn="false" value="ONE_WIRE_PIN=4"/>
 									<listOptionValue builtIn="false" value="ADC_PIN=6"/>
-									<listOptionValue builtIn="false" value="HW_DS18B20"/>
 									<listOptionValue builtIn="false" value="HW_HM10"/>
+									<listOptionValue builtIn="false" value="HW_DS18B20"/>
 									<listOptionValue builtIn="false" value="ARDUINO=10618"/>
 									<listOptionValue builtIn="false" value="__AVR_ATmega328P__"/>
 								</option>
