@@ -72,6 +72,9 @@ void ModuleDS18B20::onLoop() {
 
 void ModuleDS18B20::doMeasurement() {
   //do reading now
+  if (address[0] != 0x28) {
+    findSensor();
+  }
   bool requestRet = sensor->request(address);
   if (requestRet) {
     while (!sensor->available()) {
@@ -79,7 +82,6 @@ void ModuleDS18B20::doMeasurement() {
     }
 
     float result = sensor->readTemperature(address);
-
     if (result != TEMP_ERROR) {
       sharedStorage.addMeasurement(DS18B20_STORAGE_ID, result);
     }
@@ -146,4 +148,23 @@ bool ModuleDS18B20::handleCommand() {
 
   return false;
 }
+
+void ModuleDS18B20::findSensor() {
+  while (oneWire.search(address)) {
+    //not temp sensor
+    if (address[0] != 0x28) {
+      continue;
+    }
+    //Incorrect crc
+    if (OneWire::crc8(address, 7) != address[7]) {
+      continue;
+
+    } else {
+      //found sensor
+      return;
+    }
+  }
+  memset(address, 0, sizeof(address));
+}
+
 #endif //HW_DS18B20

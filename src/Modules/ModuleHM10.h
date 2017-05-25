@@ -52,9 +52,11 @@ class ModuleHM10: public Module, public ComandSender {
   private:
     bool swallowUntilEnd;
     bool expectPreamble;
+    uint8_t connState;  //if 0 then we are connected, used to read HM10 notif clausule
 
     void sendBTCommand(const char * command, bool waitResponse);
     void executeCommand();
+    void checkForConnectionNotification(const char letter);
 };
 
 #endif //HW_HM10

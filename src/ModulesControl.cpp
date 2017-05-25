@@ -74,5 +74,9 @@ void setupModules() {
 }
 
 void handleCommandByModules() {
-
+  Module* cur = modulesHead;
+  while (cur != nullptr) {
+    cur->handleCommand();
+    cur = cur->next;
+  }
 }

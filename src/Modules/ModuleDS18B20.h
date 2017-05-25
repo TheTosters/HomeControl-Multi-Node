@@ -61,6 +61,7 @@ class ModuleDS18B20: public Module {
     void handleConfigPeriod();
     void handleConfigResolution();
     void handleMeasurement();
+    void findSensor();
 };
 
 #endif //HW_DS18B20

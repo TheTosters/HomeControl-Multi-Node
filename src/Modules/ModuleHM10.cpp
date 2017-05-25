@@ -41,10 +41,12 @@
 #include <SharedObjects/IncommingCommands.h>
 #include <MiniParser/MiniInParser.h>
 #include <ModulesControl.h>
+#include <string.h>
 
 #define PREAMBLE_END_CHARACTER '#'
+static const char* CONNECTION_NOTIF_STR = "OK+CONN";
 
-ModuleHM10::ModuleHM10() : Module(50), expectPreamble(true) {
+ModuleHM10::ModuleHM10() : Module(50), expectPreamble(true), connState(strlen(CONNECTION_NOTIF_STR)) {
   Serial.begin(9600);
 
   //init bluetooth
@@ -76,6 +78,19 @@ void ModuleHM10::sendBTCommand(const char * command, bool waitResponse) {
 void ModuleHM10::doSendCommand(const char* dataToSend) {
   //this send Node protocol encoded command to connected client
   Serial.write((const uint8_t*)dataToSend, strlen(dataToSend));
+  Serial.flush();
+}
+
+void ModuleHM10::checkForConnectionNotification(const char letter) {
+
+  if (connState <= strlen(CONNECTION_NOTIF_STR)) {
+    uint8_t index = strlen(CONNECTION_NOTIF_STR) - connState;
+    if (CONNECTION_NOTIF_STR[index] == letter) {
+      connState--;
+    } else {
+      connState = strlen(CONNECTION_NOTIF_STR);
+    }
+  }
 }
 
 void ModuleHM10::onLoop() {
@@ -84,19 +99,24 @@ void ModuleHM10::onLoop() {
     if (tmp == -1) {
       break;  //shouldn't happend
     }
-
+    //DEBUG: Serial.write('0'+connState);
+    if (connState != 0) {
+      checkForConnectionNotification((const char)tmp);
+      continue;
+    }
     //on error or other sad thing
     if (swallowUntilEnd) {
       swallowUntilEnd = tmp != 13;
       continue;
     }
-
+    //DEBUG: Serial.write('A'+expectPreamble);
     if (expectPreamble) {
       expectPreamble = tmp != PREAMBLE_END_CHARACTER;
       continue;
     }
 
     ParseResult result = miniInParse( (char)tmp, &incommingCommand);
+    //DEBUG: Serial.write('a'+(char)result);
     switch(result) {
       case ParseResult::WILL_CONTINUE:
         break;

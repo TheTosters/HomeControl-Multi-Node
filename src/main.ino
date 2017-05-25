@@ -47,4 +47,5 @@ void loop() {
     cur->onLoop();
     cur = cur->next;
   }
+  delay(250);
 }
