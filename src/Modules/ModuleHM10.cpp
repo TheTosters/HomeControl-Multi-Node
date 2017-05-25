@@ -75,9 +75,14 @@ void ModuleHM10::sendBTCommand(const char * command, bool waitResponse) {
   }
 }
 
-void ModuleHM10::doSendCommand(const char* dataToSend) {
+void ModuleHM10::doSend(const char singleChar) {
   //this send Node protocol encoded command to connected client
-  Serial.write((const uint8_t*)dataToSend, strlen(dataToSend));
+  Serial.write((const uint8_t*)&singleChar, 1);
+}
+
+void ModuleHM10::doSendBuffer(const char* buff, uint8_t bufSize) {
+  //this send Node protocol encoded command to connected client
+  Serial.write((const uint8_t*)buff, bufSize);
   Serial.flush();
 }
 

@@ -13,12 +13,13 @@ enum class ElementType : char {UNKNOWN, DIGIT, STRING};
 class ComandSender {
   public:
     virtual ~ComandSender() = default;
-    virtual void doSendCommand(const char* dataToSend) = 0;
+    virtual void doSend(const char singleChar) = 0;
+    virtual void doSendBuffer(const char* buff, uint8_t bufSize) = 0;
 };
 
 class RemoteCommandBuilder {
     public:
-        RemoteCommandBuilder(char* outCmdBuffer, uint8_t cmdBufferSize);
+        RemoteCommandBuilder();
 
         void setSender(ComandSender* sender);
         void setCommand(const char* cmd);
@@ -30,11 +31,8 @@ class RemoteCommandBuilder {
         void startSequence();
         void endSequence();
 
-        void buildAndSendCommand();
+        void finalize();
     private:
-        char* outCmd;
-        uint8_t cmdBufferSize;
-        uint8_t index;
         ElementType elementsType;
         bool isSequenceOpen;
         bool needComa;

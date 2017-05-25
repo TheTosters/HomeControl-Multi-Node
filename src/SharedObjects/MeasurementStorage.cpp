@@ -200,5 +200,5 @@ void MeasurementStorage::sendHistory(const char* wrappingCommand, uint8_t storag
     }
     remoteCommandBuilder.endSequence();
   }
-  remoteCommandBuilder.buildAndSendCommand();
+  remoteCommandBuilder.finalize();
 }

@@ -10,11 +10,8 @@
 #include <Common.h>
 #include <string.h>
 
-RemoteCommandBuilder::RemoteCommandBuilder(char* outCmdBuffer, uint8_t cmdBufferSize)
-: outCmd(outCmdBuffer),
-  cmdBufferSize(cmdBufferSize),
-  index(0), //we will copy cmd into buffer
-  elementsType(ElementType::UNKNOWN),
+RemoteCommandBuilder::RemoteCommandBuilder()
+: elementsType(ElementType::UNKNOWN),
   isSequenceOpen(false),
   needComa(false),
   expectedNextSubsequence(false),
@@ -27,8 +24,7 @@ void RemoteCommandBuilder::setSender(ComandSender* sender) {
 }
 
 void RemoteCommandBuilder::setCommand(const char* cmd) {
-  memcpy(outCmd, cmd, 3);
-  index = 3;
+  sender->doSendBuffer(cmd, 3);
   elementsType = ElementType::UNKNOWN;
   isSequenceOpen = false;
   needComa = false;
@@ -43,11 +39,10 @@ void RemoteCommandBuilder::addArgument(const int32_t value) {
 
     elementsType = ElementType::DIGIT;
     if (needComa == true) {
-        outCmd[index++] = ',';
+        sender->doSend(',');
     }
     String s(value);
-    strcpy(&outCmd[index], s.c_str());
-    index += s.length();
+    sender->doSendBuffer(s.c_str(), s.length());
     needComa = true;
 }
 
@@ -58,12 +53,11 @@ void RemoteCommandBuilder::addArgument(const float value) {
   }
   elementsType = ElementType::DIGIT;
   if (needComa == true) {
-    outCmd[index++] = ',';
+    sender->doSend(',');
   }
 
   String s(value, 3);
-  strcpy(&outCmd[index], s.c_str());
-  index += s.length();
+  sender->doSendBuffer(s.c_str(), s.length());
   needComa = true;
 }
 
@@ -74,14 +68,11 @@ void RemoteCommandBuilder::addArgument(char* value) {
   }
   elementsType = ElementType::STRING;
   if (needComa == true) {
-    outCmd[index++] = ',';
+    sender->doSend(',');
   }
-  outCmd[index++] = '"';
-  while( (*value) != 0) {
-    outCmd[index++] = *value;
-    value++;
-  }
-  outCmd[index++] = '"';
+  sender->doSend('"');
+  sender->doSendBuffer(value, strlen(value));
+  sender->doSend('"');
   needComa = true;
 }
 
@@ -91,7 +82,7 @@ void RemoteCommandBuilder::startSequence() {
     return;
   }
   isSequenceOpen = true;
-  outCmd[index++] = '(';
+  sender->doSend('(');
   needComa = false;
   expectedNextSubsequence = false;
 }
@@ -103,17 +94,14 @@ void RemoteCommandBuilder::endSequence() {
   }
 
   isSequenceOpen = false;
-  outCmd[index++] = ')';
+  sender->doSend(')');
   needComa = false;
   expectedNextSubsequence = true;
 }
 
-void RemoteCommandBuilder::buildAndSendCommand() {
+void RemoteCommandBuilder::finalize() {
   if (isSequenceOpen == true) {
     INTERNAL_FAIL();
   }
-  outCmd[index++] = '\r';
-  outCmd[index] = 0;
-
-  sender->doSendCommand(outCmd);
+  sender->doSend('\r');
 }

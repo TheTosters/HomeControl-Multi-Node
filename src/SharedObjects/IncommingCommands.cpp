@@ -38,4 +38,4 @@
 static const char stringBuffer[MAX_IN_STRING_BUFFER] = {0};
 
 Command incommingCommand((char*)stringBuffer, MAX_IN_STRING_BUFFER);
-RemoteCommandBuilder remoteCommandBuilder((char*)stringBuffer, MAX_IN_STRING_BUFFER);
+RemoteCommandBuilder remoteCommandBuilder;

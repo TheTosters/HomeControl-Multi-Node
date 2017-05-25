@@ -96,7 +96,7 @@ void ModuleDS18B20::handleConfigPeriod() {
     //this was query, respond to it
     remoteCommandBuilder.setCommand(S_CMD_CONFIG_TEMP_READING_PERIOD);
     remoteCommandBuilder.addArgument( (int32_t) measurementPeriod / 1000);
-    remoteCommandBuilder.buildAndSendCommand();
+    remoteCommandBuilder.finalize();
 
   } else if (incommingCommand.outParamType == OutParamType::INT_DIGIT) {
     //this was set
@@ -110,7 +110,7 @@ void ModuleDS18B20::handleConfigResolution() {
     //this was query, respond to it
     remoteCommandBuilder.setCommand(S_CMD_CONFIG_TEMP_MEASURE_RESOLUTION);
     remoteCommandBuilder.addArgument((int32_t)resolution);
-    remoteCommandBuilder.buildAndSendCommand();
+    remoteCommandBuilder.finalize();
 
   } else if (incommingCommand.outParamType == OutParamType::INT_DIGIT) {
     //this was set

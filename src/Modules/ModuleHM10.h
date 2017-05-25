@@ -48,7 +48,8 @@ class ModuleHM10: public Module, public ComandSender {
     ModuleHM10();
     virtual ~ModuleHM10() = default;
     virtual void onLoop() override;
-    virtual void doSendCommand(const char* dataToSend) override;
+    virtual void doSend(const char singleChar) override;
+    virtual void doSendBuffer(const char* buff, uint8_t bufSize) override;
   private:
     bool swallowUntilEnd;
     bool expectPreamble;
