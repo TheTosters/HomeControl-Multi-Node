@@ -33,7 +33,6 @@ main.ino
 Created on: May 21, 2017
     Author: Bartłomiej Żarnowski (Toster)
 */
-
 #include <Arduino.h>
 #include <ModulesControl.h>
 

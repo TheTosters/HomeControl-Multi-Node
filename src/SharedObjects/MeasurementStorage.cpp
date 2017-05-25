@@ -140,9 +140,9 @@ void MeasurementStorage::getMeasurement(uint8_t storageId, int8_t index, int32_t
 }
 
 void MeasurementStorage::innerGetMeasurement(StorageNode* node, int8_t index, float& floatValue, unsigned long& timestamp) {
-  if (index > 0 && index < node->count) {
-      timestamp = node->timestamps[index];
-      floatValue = ((float*) node->values)[index];
+  if (index >= 0 && index < node->count) {
+      timestamp = node->timestamps[node->count - index - 1];
+      floatValue = ((float*) node->values)[node->count - index - 1];
     } else {
       timestamp = 0;
       floatValue = 0;
@@ -150,9 +150,9 @@ void MeasurementStorage::innerGetMeasurement(StorageNode* node, int8_t index, fl
 }
 
 void MeasurementStorage::innerGetMeasurement(StorageNode* node, int8_t index, int32_t& intValue, unsigned long& timestamp) {
-  if (index > 0 && index < node->count) {
-    timestamp = node->timestamps[index];
-    intValue = ((int32_t*) node->values)[index];
+  if (index >= 0 && index < node->count) {
+    timestamp = node->timestamps[node->count - index - 1];
+    intValue = ((int32_t*) node->values)[node->count - index - 1];
   } else {
     timestamp = 0;
     intValue = 0;
@@ -189,13 +189,13 @@ void MeasurementStorage::sendHistory(const char* wrappingCommand, uint8_t storag
     if (node->isFloat) {
       float value;
       innerGetMeasurement(node, t, value, timestamp);
-      remoteCommandBuilder.addArgument( (int32_t)(now - timestamp) );
+      remoteCommandBuilder.addArgument( (int32_t)(now - timestamp) / 1000);
       remoteCommandBuilder.addArgument(value);
 
     } else {
       int32_t value;
       innerGetMeasurement(node, t, value, timestamp);
-      remoteCommandBuilder.addArgument( (int32_t)(now - node->timestamps[t]) );
+      remoteCommandBuilder.addArgument( (int32_t)(now - node->timestamps[t]) / 1000);
       remoteCommandBuilder.addArgument(value);
     }
     remoteCommandBuilder.endSequence();
