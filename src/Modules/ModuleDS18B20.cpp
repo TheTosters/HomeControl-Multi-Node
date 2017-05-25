@@ -74,13 +74,13 @@ void ModuleDS18B20::doMeasurement() {
   //do reading now
   if (address[0] != 0x28) {
     findSensor();
+    sensor->begin(resolution);
   }
   bool requestRet = sensor->request(address);
   if (requestRet) {
     while (!sensor->available()) {
       //timeout is included in the sensor
     }
-
     float result = sensor->readTemperature(address);
     if (result != TEMP_ERROR) {
       sharedStorage.addMeasurement(DS18B20_STORAGE_ID, result);
