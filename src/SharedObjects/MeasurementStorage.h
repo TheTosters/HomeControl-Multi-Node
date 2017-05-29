@@ -46,7 +46,7 @@ class StorageNode {
     const bool isFloat;
     uint8_t count;  //how many are actually inserted
     void* values;
-    unsigned long* timestamps;
+    uint16_t* timestamps;
 
     StorageNode(uint8_t id, uint8_t size, bool isFloat);
 };
@@ -57,16 +57,16 @@ class MeasurementStorage {
     void prepareStorage(uint8_t storageId, bool isFloat, int8_t size);
     void addMeasurement(uint8_t storageId, float value);
     void addMeasurement(uint8_t storageId, int32_t value);
-    void getMeasurement(uint8_t storageId, int8_t index, float& floatValue, unsigned long& timestamp);
-    void getMeasurement(uint8_t storageId, int8_t index, int32_t& intValue, unsigned long& timestamp);
+    void getMeasurement(uint8_t storageId, int8_t index, float& floatValue, uint16_t& timestamp);
+    void getMeasurement(uint8_t storageId, int8_t index, int32_t& intValue, uint16_t& timestamp);
     uint8_t getMeasurementCount(uint8_t storageId);
     void sendHistory(const char* wrappingCommand, uint8_t storageId, uint8_t count);
   private:
     StorageNode* listHead;
 
     StorageNode* getNode(uint8_t storageId);
-    void innerGetMeasurement(StorageNode* node, int8_t index, float& floatValue, unsigned long& timestamp);
-    void innerGetMeasurement(StorageNode* node, int8_t index, int32_t& intValue, unsigned long& timestamp);
+    void innerGetMeasurement(StorageNode* node, int8_t index, float& floatValue, uint16_t& timestamp);
+    void innerGetMeasurement(StorageNode* node, int8_t index, int32_t& intValue, uint16_t& timestamp);
 };
 
 extern MeasurementStorage sharedStorage;
