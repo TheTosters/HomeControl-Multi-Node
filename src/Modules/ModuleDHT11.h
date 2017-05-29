@@ -36,7 +36,7 @@
 #ifndef ModuleDHT11_hpp
 #define ModuleDHT11_hpp
 
-//#ifdef HW_DHT11
+#ifdef HW_DHT11
 
 #include <Modules/Module.hpp>
 #include <DHT.h>
@@ -50,16 +50,20 @@ class ModuleDHT11: public Module {
 
   private:
     uint8_t sharedConfId; //caution: this must be set before you can read from config, order in initializer do matter
-    unsigned long lastMeasurementTimeStamp;
-    unsigned long measurementPeriod;
+    unsigned long lastTempMeasurementTimeStamp;
+    unsigned long tempMeasurementPeriod;
+    unsigned long lastHumMeasurementTimeStamp;
+    unsigned long humMeasurementPeriod;
     DHT* sensor;
 
-    void doMeasurement();
+    void doTempMeasurement();
+    void doHumMeasurement();
     bool handleTemperatureMeasurement();
     bool handleHumidityMeasurement();
-    bool handleConfigPeriod();
+    bool handleTempConfigPeriod();
+    bool handleHumidityConfigPeriod();
 };
 
-//#endif //HW_DHT11
+#endif //HW_DHT11
 
 #endif /* ModuleDHT11_hpp */

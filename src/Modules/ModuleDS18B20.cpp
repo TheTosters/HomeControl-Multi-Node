@@ -110,6 +110,7 @@ void ModuleDS18B20::doMeasurement() {
     float result = sensor->readTemperature(address);
     if (result != TEMP_ERROR) {
       sharedStorage.addMeasurement(DS18B20_STORAGE_ID, result);
+      lastMeasurementTimeStamp = millis();
     }
 
   } else {
