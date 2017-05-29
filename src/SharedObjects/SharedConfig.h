@@ -29,42 +29,30 @@
  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- ModuleDS18B20.h
- Created on: May 21, 2017
+ SharedConfig.h
+ Created on: May 29, 2017
  Author: Bartłomiej Żarnowski (Toster)
  */
-#ifndef ModuleDS18B20_hpp
-#define ModuleDS18B20_hpp
+#ifndef SharedConfig_hpp
+#define SharedConfig_hpp
 
-#ifdef HW_DS18B20
-
-#include <Modules/Module.hpp>
 #include <Arduino.h>
-#include <DS18B20.h>
 
-
-class ModuleDS18B20: public Module {
+class SharedConfig {
   public:
-    ModuleDS18B20();
-    virtual ~ModuleDS18B20() = default;
-    virtual void onLoop() override;
-    virtual bool handleCommand() override;
-
+    SharedConfig();
+    /**
+     * Returns slotId, it should be used to read/write operations. If slotsCount > 1 then valid id's are:
+     * returnedId up to returnedId+slotsCount. For example:
+     * int8_t id = reserveSlots(3);
+     * writeSlot(id+2, 123); //<< to write data into 3rd reserved slot.
+     */
+    int8_t reserveSlots(int slotsCount);
+    void writeSlot(int slotId, uint32_t data);
+    uint32_t readSlot(int slotId);
   private:
-    uint8_t sharedConfId; //caution: this must be set before you can read from config, order in initializer do matter
-    unsigned long lastMeasurementTimeStamp;
-    unsigned long measurementPeriod;
-    uint8_t  address[8];
-    DS18B20* sensor;
-
-    void doMeasurement();
-    void handleConfigPeriod();
-    void handleConfigResolution();
-    void handleMeasurement();
-    void findSensor();
-    uint8_t getResolution();
+    uint8_t nextFreeSlot;
 };
 
-#endif //HW_DS18B20
-
-#endif /* ModuleDS18B20_hpp */
+extern SharedConfig sharedConfig;
+#endif /* SharedConfig_hpp */

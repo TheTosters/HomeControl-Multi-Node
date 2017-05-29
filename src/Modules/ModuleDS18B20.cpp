@@ -39,6 +39,7 @@
 #include <Modules/ModuleDS18B20.h>
 #include <SharedObjects/OneWireShared.h>
 #include <SharedObjects/MeasurementStorage.h>
+#include <SharedObjects/SharedConfig.h>
 #include <MiniParser/CommandsId.hpp>
 #include <SharedObjects/IncommingCommands.h>
 #include <MiniParser/RemoteCommandBuilder.h>
@@ -46,21 +47,46 @@
 
 #define DEFAULT_READ_PERIOD (5UL * 60 * 1000)
 #define MIN_MEASUREMEND_PERIOD (5 * 1000)
+#define MAX_MEASUREMEND_PERIOD (72UL * 60 * 1000)
+
+#define MIN_RESOLUTION 9
+#define MAX_RESOLUTION 12
+#define DEFAULT_RESOLUTION 12
+
 #define DS18B20_STORAGE_ID  0x0d
 
 #ifndef DS18B20_STORAGE_SIZE
 #define DS18B20_STORAGE_SIZE 10
 #endif
 
+//those offsets are used for config purpouses
+#define MEASUREMENT_PERIOD_CONFIG 0
+#define RESOLUTION_CONFIG 1
+
 ModuleDS18B20::ModuleDS18B20()
 : Module(10),
+  sharedConfId( sharedConfig.reserveSlots(2) ),
   lastMeasurementTimeStamp( millis() ),
-  measurementPeriod( DEFAULT_READ_PERIOD ),
+  measurementPeriod( sharedConfig.readSlot(sharedConfId + MEASUREMENT_PERIOD_CONFIG) ),
   address{0},
-  resolution(12),
   sensor(new DS18B20(&oneWire) ) {
 
   sharedStorage.prepareStorage(DS18B20_STORAGE_ID, true, DS18B20_STORAGE_SIZE);
+  //validate values, in case of firs boot and no EEPROM data
+  if ((measurementPeriod < MIN_MEASUREMEND_PERIOD) || (measurementPeriod >= MAX_MEASUREMEND_PERIOD)) {
+    measurementPeriod = DEFAULT_READ_PERIOD;
+    sharedConfig.writeSlot(sharedConfId + MEASUREMENT_PERIOD_CONFIG, measurementPeriod);
+  }
+
+}
+
+uint8_t ModuleDS18B20::getResolution() {
+  uint8_t resolution = sharedConfig.readSlot(sharedConfId + RESOLUTION_CONFIG);
+  if (resolution < MIN_RESOLUTION || resolution > MAX_RESOLUTION) {
+    resolution = DEFAULT_RESOLUTION;
+    sharedConfig.writeSlot(sharedConfId + RESOLUTION_CONFIG, resolution);
+  }
+  return resolution;
 }
 
 void ModuleDS18B20::onLoop() {
@@ -74,7 +100,7 @@ void ModuleDS18B20::doMeasurement() {
   //do reading now
   if (address[0] != 0x28) {
     findSensor();
-    sensor->begin(resolution);
+    sensor->begin(getResolution());
   }
   bool requestRet = sensor->request(address);
   if (requestRet) {
@@ -109,12 +135,13 @@ void ModuleDS18B20::handleConfigResolution() {
   if (incommingCommand.outParamType == OutParamType::NONE) {
     //this was query, respond to it
     remoteCommandBuilder.setCommand(S_CMD_CONFIG_TEMP_MEASURE_RESOLUTION);
-    remoteCommandBuilder.addArgument((int32_t)resolution);
+    remoteCommandBuilder.addArgument((int32_t)getResolution());
     remoteCommandBuilder.finalize();
 
   } else if (incommingCommand.outParamType == OutParamType::INT_DIGIT) {
     //this was set
-    resolution = constrain(incommingCommand.integerValue, 9, 12);
+    uint8_t resolution = constrain(incommingCommand.integerValue, MIN_RESOLUTION, MAX_RESOLUTION);
+    sharedConfig.writeSlot(sharedConfId + RESOLUTION_CONFIG, resolution);
     sensor->begin(resolution);
   }
 }

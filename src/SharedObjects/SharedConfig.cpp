@@ -29,42 +29,48 @@
  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- ModuleDS18B20.h
- Created on: May 21, 2017
+ SharedConfig.cpp
+ Created on: May 29, 2017
  Author: Bartłomiej Żarnowski (Toster)
  */
-#ifndef ModuleDS18B20_hpp
-#define ModuleDS18B20_hpp
+#include <SharedObjects/SharedConfig.h>
+#include <EEPROM.h>
 
-#ifdef HW_DS18B20
+SharedConfig sharedConfig;
 
-#include <Modules/Module.hpp>
-#include <Arduino.h>
-#include <DS18B20.h>
+SharedConfig::SharedConfig() : nextFreeSlot(0) {
+}
 
+int8_t SharedConfig::reserveSlots(int slotsCount) {
+  uint8_t tmp = nextFreeSlot;
+  nextFreeSlot += slotsCount;
+  return tmp;
+}
 
-class ModuleDS18B20: public Module {
-  public:
-    ModuleDS18B20();
-    virtual ~ModuleDS18B20() = default;
-    virtual void onLoop() override;
-    virtual bool handleCommand() override;
+void SharedConfig::writeSlot(int slotId, uint32_t data) {
+#ifdef ESP8266
+  EEPROM.begin(1024);
+#endif
 
-  private:
-    uint8_t sharedConfId; //caution: this must be set before you can read from config, order in initializer do matter
-    unsigned long lastMeasurementTimeStamp;
-    unsigned long measurementPeriod;
-    uint8_t  address[8];
-    DS18B20* sensor;
+  int addr = slotId * sizeof(uint32_t);
+  EEPROM.put(addr, data);
 
-    void doMeasurement();
-    void handleConfigPeriod();
-    void handleConfigResolution();
-    void handleMeasurement();
-    void findSensor();
-    uint8_t getResolution();
-};
+#ifdef ESP8266
+  EEPROM.end();
+#endif
+}
 
-#endif //HW_DS18B20
+uint32_t SharedConfig::readSlot(int slotId) {
+#ifdef ESP8266
+  EEPROM.begin(1024);
+#endif
 
-#endif /* ModuleDS18B20_hpp */
+  uint32_t tmp;
+  int addr = slotId * sizeof(uint32_t);
+  EEPROM.get(addr, tmp);
+
+#ifdef ESP8266
+  EEPROM.end();
+#endif
+  return tmp;
+}
