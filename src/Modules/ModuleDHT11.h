@@ -29,24 +29,22 @@
  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- ModuleDS18B20.h
- Created on: May 21, 2017
+ ModuleDHT11.h
+ Created on: May 29, 2017
  Author: Bartłomiej Żarnowski (Toster)
  */
-#ifndef ModuleDS18B20_hpp
-#define ModuleDS18B20_hpp
+#ifndef ModuleDHT11_hpp
+#define ModuleDHT11_hpp
 
-#ifdef HW_DS18B20
+//#ifdef HW_DHT11
 
 #include <Modules/Module.hpp>
-#include <Arduino.h>
-#include <DS18B20.h>
+#include <DHT.h>
 
-
-class ModuleDS18B20: public Module {
+class ModuleDHT11: public Module {
   public:
-    ModuleDS18B20();
-    virtual ~ModuleDS18B20() = default;
+    ModuleDHT11();
+    virtual ~ModuleDHT11() = default;
     virtual void onLoop() override;
     virtual bool handleCommand() override;
 
@@ -54,17 +52,14 @@ class ModuleDS18B20: public Module {
     uint8_t sharedConfId; //caution: this must be set before you can read from config, order in initializer do matter
     unsigned long lastMeasurementTimeStamp;
     unsigned long measurementPeriod;
-    uint8_t  address[8];
-    DS18B20* sensor;
+    DHT* sensor;
 
     void doMeasurement();
+    bool handleTemperatureMeasurement();
+    bool handleHumidityMeasurement();
     bool handleConfigPeriod();
-    bool handleConfigResolution();
-    bool handleMeasurement();
-    void findSensor();
-    uint8_t getResolution();
 };
 
-#endif //HW_DS18B20
+//#endif //HW_DHT11
 
-#endif /* ModuleDS18B20_hpp */
+#endif /* ModuleDHT11_hpp */

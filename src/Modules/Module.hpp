@@ -36,6 +36,8 @@ Created on: May 21, 2017
 #ifndef module_hpp
 #define module_hpp
 
+#include <Arduino.h>
+
 class Module {
   public:
     Module* next;

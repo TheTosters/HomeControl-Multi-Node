@@ -40,8 +40,8 @@
 #include <SharedObjects/OneWireShared.h>
 #include <SharedObjects/MeasurementStorage.h>
 #include <SharedObjects/SharedConfig.h>
-#include <MiniParser/CommandsId.hpp>
 #include <SharedObjects/IncommingCommands.h>
+#include <MiniParser/CommandsId.hpp>
 #include <MiniParser/RemoteCommandBuilder.h>
 #include <Common.h>
 
@@ -117,63 +117,77 @@ void ModuleDS18B20::doMeasurement() {
   }
 }
 
-void ModuleDS18B20::handleConfigPeriod() {
+bool ModuleDS18B20::handleConfigPeriod() {
+  bool result = false;
   if (incommingCommand.outParamType == OutParamType::NONE) {
     //this was query, respond to it
     remoteCommandBuilder.setCommand(S_CMD_CONFIG_TEMP_READING_PERIOD);
     remoteCommandBuilder.addArgument( (int32_t) measurementPeriod / 1000);
     remoteCommandBuilder.finalize();
+    result = true;
 
   } else if (incommingCommand.outParamType == OutParamType::INT_DIGIT) {
     //this was set
     measurementPeriod = incommingCommand.integerValue * 1000;
     measurementPeriod = measurementPeriod < MIN_MEASUREMEND_PERIOD ? MIN_MEASUREMEND_PERIOD : measurementPeriod;
+    sharedConfig.writeSlot(sharedConfId + MEASUREMENT_PERIOD_CONFIG, measurementPeriod);
+    result = true;
   }
+  return result;
 }
 
-void ModuleDS18B20::handleConfigResolution() {
+bool ModuleDS18B20::handleConfigResolution() {
+  bool result = false;
   if (incommingCommand.outParamType == OutParamType::NONE) {
     //this was query, respond to it
     remoteCommandBuilder.setCommand(S_CMD_CONFIG_TEMP_MEASURE_RESOLUTION);
     remoteCommandBuilder.addArgument((int32_t)getResolution());
     remoteCommandBuilder.finalize();
+    result = true;
 
   } else if (incommingCommand.outParamType == OutParamType::INT_DIGIT) {
     //this was set
     uint8_t resolution = constrain(incommingCommand.integerValue, MIN_RESOLUTION, MAX_RESOLUTION);
     sharedConfig.writeSlot(sharedConfId + RESOLUTION_CONFIG, resolution);
     sensor->begin(resolution);
+    result = true;
   }
+  return result;
 }
 
-void ModuleDS18B20::handleMeasurement() {
+bool ModuleDS18B20::handleMeasurement() {
+  bool result = false;
   if (incommingCommand.outParamType == OutParamType::NONE) {
     //do measurement right now, store in history and return it
     doMeasurement();
     sharedStorage.sendHistory(S_CMD_DELIVER_TEMP_HISTORY, DS18B20_STORAGE_ID, 1);
+    result = true;
 
   } else if (incommingCommand.outParamType == OutParamType::INT_DIGIT) {
     //request some portion of historical data
     sharedStorage.sendHistory(S_CMD_DELIVER_TEMP_HISTORY, DS18B20_STORAGE_ID, incommingCommand.integerValue);
+    result = true;
   }
+  return result;
 }
 
 bool ModuleDS18B20::handleCommand() {
+  bool result = false;
   switch(incommingCommand.cmd) {
     case CMD_READ_TEMPERATURE_MESUREMENT:
-      handleMeasurement();
+      result = handleMeasurement();
       break;
 
     case CMD_CONFIG_TEMP_READING_PERIOD:
-      handleConfigPeriod();
+      result = handleConfigPeriod();
       break;
 
     case CMD_CONFIG_TEMP_MEASURE_RESOLUTION:
-      handleConfigResolution();
+      result = handleConfigResolution();
       break;
   }
 
-  return false;
+  return result;
 }
 
 void ModuleDS18B20::findSensor() {

@@ -26,9 +26,17 @@
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/cores/arduino"/>
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/variants/eightanaloginputs"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/lib/DS18B20"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/src"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/lib/DS18B20"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT11_ID436"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src"/>
@@ -80,9 +88,17 @@
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/cores/arduino"/>
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/variants/eightanaloginputs"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/lib/DS18B20"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/src"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/lib/DS18B20"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT11_ID436"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src"/>
@@ -134,9 +150,17 @@
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/cores/arduino"/>
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/variants/eightanaloginputs"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/lib/DS18B20"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/src"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/lib/DS18B20"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/Adafruit Unified Sensor_ID31"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT sensor library_ID19"/>
+									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/DHT11_ID436"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
 									<listOptionValue builtIn="false" value="${HOME}/Desktop/WORK/CreatorTime/HomeControl-Multi-Node/.piolibdeps/OneWire_ID1"/>
 									<listOptionValue builtIn="false" value="${HOME}/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src"/>

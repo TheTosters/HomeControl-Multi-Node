@@ -37,6 +37,7 @@ Created on: May 21, 2017
 #include <Arduino.h>
 #include <Modules/ModuleDS18B20.h>
 #include <Modules/ModuleHM10.h>
+#include <Modules/ModuleDHT11.h>
 #include <ModulesControl.h>
 #include <SharedObjects/IncommingCommands.h>
 
@@ -64,6 +65,10 @@ void setupModules() {
 
 #ifdef HW_DS18B20
   addModule(new ModuleDS18B20());
+#endif
+
+#ifdef HW_DHT11
+  addModule(new ModuleDHT11());
 #endif
 
 #ifdef HW_HM10
